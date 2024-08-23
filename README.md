@@ -2,21 +2,21 @@
 
 ## Project Setup
 
-### 1. Clone the Repository
+1. Clone the Repository
 First, clone the project repository from GitHub using HTTPS:
 ```
 git clone https://github.com/kmd-shafi/weather-data.git
 ```
-### 2. npm install
+2. npm install
 This will install all dependencies listed in the package.json file, including:
 ```
 npm install
 ```
-### 3. Environment Setup
+3. Environment Setup
 Create a .env file in the root directory of the project and add your OpenWeatherMap API key:
 APIKEY=your_openweathermap_api_key_here
 
-### 4. Running the Application
+4. Running the Application
 Once setup is complete, run the application using:
 ```
 node index.js
