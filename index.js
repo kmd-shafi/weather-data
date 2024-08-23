@@ -5,6 +5,7 @@ const fs=require('fs');
 const puppeteer = require('puppeteer');
 const path = require('path');
 const inquirer = require('inquirer');
+const indiancities = require('indian-cities-database');
 
 
 const rl = readline.createInterface({
@@ -17,7 +18,11 @@ let totalCities;
 
 function startCityInput() {
   const createPrompt = inquirer.createPromptModule();
-  const options = ['Adoni', 'Amaravati', 'Anantapur', 'Chandragiri', 'Chittor', 'Guntur', 'Kakinada', 'Tirupati', 'Vijayawada', 'Visakhapatnam'];
+  const options = [];
+
+const allCities = indiancities.cities;
+const maharashtraCities = allCities.filter(city => city.state === 'Andhra Pradesh');
+maharashtraCities.forEach(city => options.push(city.city));
 
   createPrompt([
     {
