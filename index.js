@@ -112,7 +112,7 @@ async function generatePDF(cityHtml, avgTemp, avgHumidity) {
   try {
     const date = new Date();
     const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    const fullTime = date.toLocaleTimeString().toString();
+    const fullTime = date.toLocaleTimeString().toString().replace(/:/g, '*').replace(/\s/g, '*_');
 
     const htmlContent =`
     <!DOCTYPE html>
