@@ -1,12 +1,11 @@
 const axios = require('axios');
 const readline = require('readline');
 require('dotenv').config()
-const fs=require('fs');
+const fs = require('fs');
 const puppeteer = require('puppeteer');
 const path = require('path');
 const inquirer = require('inquirer');
 const indiancities = require('indian-cities-database');
-
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -20,76 +19,100 @@ function startCityInput() {
   const createPrompt = inquirer.createPromptModule();
   const options = [];
 
-const allCities = indiancities.cities;
-const maharashtraCities = allCities.filter(city => city.state === 'Andhra Pradesh');
-maharashtraCities.forEach(city => options.push(city.city));
+  try {
+    const allCities = indiancities.cities;
+    const maharashtraCities = allCities.filter(city => city.state === 'Andhra Pradesh');
+    maharashtraCities.forEach(city => options.push(city.city));
 
-  createPrompt([
-    {
-      type: 'checkbox',
-      name: 'selectedOption',
-      message: 'Please select an option:',
-      choices: options,
-    },
-  ])
-    .then((answers) => {
-      cities.push(...answers.selectedOption);
-      totalCities = cities.length;
-      fetchWeatherData();
-    });
+    createPrompt([
+      {
+        type: 'checkbox',
+        name: 'selectedOption',
+        message: 'Please select an option:',
+        choices: options,
+      },
+    ])
+      .then((answers) => {
+        cities.push(...answers.selectedOption);
+        totalCities = cities.length;
+        if (totalCities === 0) {
+          console.log("No cities selected. Exiting...");
+          rl.close();
+        } else {
+          fetchWeatherData();
+        }
+      })
+      .catch((error) => {
+        console.error("Error in city selection:", error);
+        rl.close();
+      });
+  } catch (error) {
+    console.error("Error in startCityInput:", error);
+    rl.close();
+  }
 }
 
 function fetchWeatherData() {
-  const promises=cities.map(city=>{
-    const api =
-    `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.APIKEY}&units=metric`;
-    return axios.get(api)
+  const promises = cities.map(city => {
+    const api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.APIKEY}&units=metric`;
+    return axios.get(api).catch(error => {
+      console.error(`Error fetching data for ${city}:`, error.message);
+      return null;
+    });
   });
-  
-  Promise.all(promises)
-  .then(responses => {
-    let totalTemp=0;
-    let totalHumidity=0;
-    let cityHtml=''
 
-    responses.forEach(response => {
-      const weatherData = response.data;
-      totalTemp += weatherData.main.temp;
-      totalHumidity += weatherData.main.humidity;
-      cityHtml +=`
-          <tr>
-            <td>${weatherData.name}</td>
-            <td>${weatherData.main.temp}°C</td>
-            <td>${weatherData.weather[0].description}</td>
-            <td>${weatherData.main.humidity}%</td>
-          </tr>
-      `
+  Promise.all(promises)
+    .then(responses => {
+      let totalTemp = 0;
+      let totalHumidity = 0;
+      let cityHtml = '';
+      let validResponses = 0;
+
+      responses.forEach(response => {
+        if (response && response.data) {
+          const weatherData = response.data;
+          totalTemp += weatherData.main.temp;
+          totalHumidity += weatherData.main.humidity;
+          validResponses++;
+          cityHtml += `
+            <tr>
+              <td>${weatherData.name}</td>
+              <td>${weatherData.main.temp}°C</td>
+              <td>${weatherData.weather[0].description}</td>
+              <td>${weatherData.main.humidity}%</td>
+            </tr>
+          `;
+        }
+      });
+
+      if (validResponses === 0) {
+        throw new Error("No valid weather data received");
+      }
+
+      const avgTemp = totalTemp / validResponses;
+      const avgHumidity = totalHumidity / validResponses;
+
+      return generatePDF(cityHtml, avgTemp, avgHumidity);
+    })
+    .then(() => {
+      console.log("PDF generation completed.");
+    })
+    .catch(err => {
+      console.error("Error in fetchWeatherData:", err.message);
+    })
+    .finally(() => {
+      rl.close();
     });
 
-    const avgTemp=totalTemp/cities.length;
-    const avgHumidity=totalHumidity/cities.length
+  console.log('Fetching weather data for:', cities);
+}
 
-    async function generatePDF(html, filename) {
-      const browser = await puppeteer.launch({ headless: true });
-      const page = await browser.newPage();
-      await page.setContent(html);
-    
-      
-      const reportsDir = path.join(__dirname, 'reports');
-      if (!fs.existsSync(reportsDir)) {
-        fs.mkdirSync(reportsDir);
-      }
-      const pdfPath = path.join(reportsDir, filename);
-      await page.pdf({ path: pdfPath, format: 'A4' });
-      await browser.close();
-      console.log(`PDF saved at: ${pdfPath}`);
-    }
-
-
+async function generatePDF(cityHtml, avgTemp, avgHumidity) {
+  let browser;
+  try {
     const date = new Date();
     const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const fullTime = date.toLocaleTimeString().toString();
-
 
     const htmlContent =`
     <!DOCTYPE html>
@@ -141,7 +164,7 @@ function fetchWeatherData() {
 <body>
     <div class="container">
         <h1>Weather Report</h1>
-        <p>${formattedDate+" "+fullTime}</p>
+        <p>${formattedDate+"_"+fullTime}</p>
 
         <table style="width:100%" class='city'>
           <tr>
@@ -163,24 +186,28 @@ function fetchWeatherData() {
 </html>
     `
 
-    const pdfFilename = `weather_report_${formattedDate+" "+fullTime}.pdf`;
-    generatePDF(htmlContent, pdfFilename);
+    browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.setContent(htmlContent);
 
-  })
-  .catch(err=>{
-    console.log("error of fetching data :",err.message);
-  })
-  .finally(()=>{
-    rl.close();
-  });
- 
-  console.log('Fetching weather data for:', cities);
+    const reportsDir = path.join(__dirname, 'reports');
+    if (!fs.existsSync(reportsDir)) {
+      fs.mkdirSync(reportsDir);
+    }
+    const pdfFilename = `weather_report_${formattedDate+"_"+fullTime}.pdf`;
+    const pdfPath = path.join(reportsDir, pdfFilename);
+    await page.pdf({ path: pdfPath, format: 'A4' });
+    console.log(`PDF saved at: ${pdfPath}`);
+  } catch (error) {
+    console.error("Error in generatePDF:", error);
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
 }
 
 startCityInput();
-
-
-
 
 
 
