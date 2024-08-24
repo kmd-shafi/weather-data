@@ -41,3 +41,9 @@ Click Enter
 ### 2. PDF Generation
 In root directory of the project the report folder save the pdf's
 ![City Selection](image1.png)
+
+## Totorial Video
+
+```
+https://www.loom.com/share/f1a8eda08cea4b43827ab70c85a3e6cb?sid=da20e5f7-2cdd-477e-9085-88cff188d0b4
+```
