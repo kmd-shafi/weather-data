@@ -45,5 +45,5 @@ In root directory of the project the report folder save the pdf's
 ## Totorial Video
 
 ```
-https://www.loom.com/share/f1a8eda08cea4b43827ab70c85a3e6cb?sid=da20e5f7-2cdd-477e-9085-88cff188d0b4
+https://www.loom.com/share/7b46a79f2f8b4ce48d29f32354220315?sid=c57393b3-6761-4c1e-928b-049655bf3774
 ```
