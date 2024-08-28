@@ -42,8 +42,6 @@ Click Enter
 In root directory of the project the report folder save the pdf's
 ![City Selection](image1.png)
 
-## Totorial Video
+## Demo Video
 
-```
-https://www.loom.com/share/7b46a79f2f8b4ce48d29f32354220315?sid=c57393b3-6761-4c1e-928b-049655bf3774
-```
+<div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/7b46a79f2f8b4ce48d29f32354220315?sid=c6450974-37e7-4e43-a06e-1bf8e718a6f5" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
