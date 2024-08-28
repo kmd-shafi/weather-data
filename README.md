@@ -44,4 +44,5 @@ In root directory of the project the report folder save the pdf's
 
 ## Demo Video
 
-<div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/7b46a79f2f8b4ce48d29f32354220315?sid=c6450974-37e7-4e43-a06e-1bf8e718a6f5" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+[![Video Title](https://cdn.loom.com/sessions/thumbnails/your-loom-video-id-with-timestamp.gif)](https://www.loom.com/share/7b46a79f2f8b4ce48d29f32354220315?sid=eec73a7d-0561-48fe-927a-20133f770e17)
+
